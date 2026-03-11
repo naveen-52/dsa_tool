@@ -7,52 +7,118 @@
 {% endblock %}
 
 {% block content %}
+
+<!-- HERO SECTION -->
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">AlgoViz Control Center</h1>
+    </div>
+    <p class="card-description">
+        Launch algorithm simulations, analyze graph structures, and explore real-time visualization of
+        Graph Coloring, Minimum Spanning Tree, and Huffman Coding.
+    </p>
+</div>
+
+
+<!-- STATISTICS -->
+<div class="dashboard-grid">
+
+    <div class="feature-card metric-card">
+        <div class="metric-number">
+            {{ stats.total_graphs }}
+        </div>
+        <div class="metric-label">
+            Total Graphs Created
+        </div>
+    </div>
+
+    <div class="feature-card metric-card">
+        <div class="metric-number">
+            {{ stats.algorithms_used }}
+        </div>
+        <div class="metric-label">
+            Algorithms Available
+        </div>
+    </div>
+
+    <div class="feature-card metric-card">
+        <div class="metric-number">
+            {{ stats.sessions }}
+        </div>
+        <div class="metric-label">
+            Visualization Sessions
+        </div>
+    </div>
+
+</div>
+
+
+<!-- QUICK ACTIONS -->
 <div class="page-header">
-    <h1 class="page-title">Welcome to AlgoViz Pro</h1>
-    <p class="page-subtitle">Visualize and explore fundamental algorithms with interactive tools designed for learning and analysis.</p>
+    <h2 class="page-title">Quick Actions</h2>
 </div>
 
 <div class="dashboard-grid">
-    <a href="/graph-coloring" class="feature-card">
+
+    <a href="/graph-coloring" class="feature-card hover-card">
         <div class="feature-icon">
             <i class="fas fa-palette"></i>
         </div>
         <h3 class="feature-title">Graph Coloring</h3>
         <p class="feature-description">
-            Discover the chromatic number of a graph using the Welsh-Powell algorithm. Visualize different coloring combinations and explore manual coloring options.
+            Visualize node coloring using the Welsh-Powell algorithm and explore chromatic numbers.
         </p>
     </a>
 
-    <a href="/mst" class="feature-card">
+    <a href="/mst" class="feature-card hover-card">
         <div class="feature-icon">
             <i class="fas fa-network-wired"></i>
         </div>
         <h3 class="feature-title">Minimum Spanning Tree</h3>
         <p class="feature-description">
-            Calculate and visualize the Minimum Spanning Tree using Prim's algorithm. Find the optimal connection path with minimum total weight.
+            Compute optimal weighted connections using Prim’s algorithm and analyze spanning paths.
         </p>
     </a>
 
-    <a href="/huffman" class="feature-card">
+    <a href="/huffman" class="feature-card hover-card">
         <div class="feature-icon">
             <i class="fas fa-code"></i>
         </div>
         <h3 class="feature-title">Huffman Coding</h3>
         <p class="feature-description">
-            Generate optimal binary codes for data compression. Analyze character frequencies and build the Huffman encoding tree.
+            Generate Huffman trees and explore optimal compression encoding strategies.
         </p>
     </a>
+
 </div>
 
+
+<!-- VISUALIZATION PREVIEW -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">About AlgoViz Pro</h3>
+        <h3 class="card-title">Live Visualization Preview</h3>
     </div>
-    <p class="card-description">
-        AlgoViz Pro is a comprehensive platform designed to help you understand and visualize complex algorithms through interactive demonstrations. Whether you're a student learning graph theory, a developer brushing up on algorithms, or an educator teaching computer science concepts, our tools provide clear, visual representations that make abstract concepts concrete.
-    </p>
-    <p class="card-description" style="margin-top: 12px;">
-        Each module is designed with both automatic computation and visualization capabilities, allowing you to focus on understanding the algorithm rather than manual calculations. Simply input your data, and let AlgoViz Pro handle the rest.
-    </p>
+
+    <div class="visualization-preview">
+        <canvas id="previewCanvas"></canvas>
+        <p class="card-description">
+            Run any algorithm to display an interactive preview here.
+        </p>
+    </div>
 </div>
+
+
+<!-- RECENT ACTIVITY -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Recent Activity</h3>
+    </div>
+
+    <ul class="card-description activity-list">
+        {% for activity in recent_activity %}
+            <li>• {{ activity }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
 {% endblock %}

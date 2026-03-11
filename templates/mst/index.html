@@ -104,7 +104,6 @@
     border-radius: 12px;
     border: 1.5px solid #e5e7eb;
     font-size: 15px;
-    transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-input-modern:focus {
@@ -129,8 +128,6 @@
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.2s ease;
-    cursor: pointer;
 }
 
 .btn-primary-modern {
@@ -139,59 +136,19 @@
     border: none;
 }
 
-.btn-primary-modern:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(79,70,229,0.35);
-}
-
 .btn-secondary-modern {
     background: #f3f4f6;
     color: #374151;
     border: 1px solid #e5e7eb;
 }
 
-.btn-secondary-modern:hover {
-    background: #e5e7eb;
-}
-
-/* ===== DESCRIPTION ===== */
-.description-modern {
-    line-height: 1.8;
-    color: #374151;
-    font-size: 15px;
-}
-
-.description-modern strong {
-    color: #111827;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .card-modern {
-        padding: 26px;
-    }
-
-    .page-title {
-        font-size: 26px;
-    }
-
-    .action-buttons-modern {
-        flex-direction: column;
-    }
-
-    .form-input-modern {
-        max-width: 100%;
-    }
-}
-
 </style>
-
 
 <!-- ===== HEADER ===== -->
 <div class="page-header">
     <h1 class="page-title">Minimum Spanning Tree</h1>
     <p class="page-subtitle">
-        Build a weighted graph and compute the optimal connection path using Prim's Algorithm.
+        Build a weighted graph and compute the optimal connection path using Prim's or Kruskal's Algorithm.
     </p>
 </div>
 
@@ -208,35 +165,62 @@
 
     <div class="alert-modern">
         <i class="fas fa-info-circle"></i>
-        <span>Enter number of vertices to generate a weighted adjacency matrix.</span>
+        <span>Enter number of vertices and choose an MST algorithm.</span>
     </div>
 
     <form action="/mst/matrix" method="POST">
 
+        <!-- Number of vertices -->
         <div class="form-group-modern">
-            <label class="form-label-modern" for="num_vertices">
+            <label class="form-label-modern">
                 Number of Vertices
             </label>
+
             <input type="number"
-                   id="num_vertices"
                    name="num_vertices"
                    class="form-input-modern"
                    min="2"
                    max="10"
-                   required
-                   placeholder="2 – 10">
+                   required>
+        </div>
+
+        <!-- Algorithm selection -->
+        <div class="form-group-modern">
+            <label class="form-label-modern">
+                Select MST Algorithm
+            </label>
+
+            <select name="algorithm" class="form-input-modern">
+
+                <option value="prim">
+                    Prim's Algorithm
+                </option>
+
+                <option value="kruskal">
+                    Kruskal's Algorithm
+                </option>
+
+            </select>
         </div>
 
         <div class="action-buttons-modern">
-            <button type="submit" class="btn-modern btn-primary-modern">
+
+            <button type="submit"
+                    class="btn-modern btn-primary-modern">
+
                 <i class="fas fa-arrow-right"></i>
                 Create Matrix
+
             </button>
 
-            <a href="/" class="btn-modern btn-secondary-modern">
+            <a href="/"
+               class="btn-modern btn-secondary-modern">
+
                 <i class="fas fa-arrow-left"></i>
                 Back to Dashboard
+
             </a>
+
         </div>
 
     </form>
@@ -251,6 +235,7 @@
     </div>
 
     <div class="description-modern">
+
         <p>
             A <strong>Minimum Spanning Tree (MST)</strong> connects all vertices
             of a weighted graph using the smallest possible total edge weight
@@ -259,19 +244,22 @@
 
         <br>
 
-        <strong>Prim’s Algorithm Steps:</strong>
-        <ol style="margin-left: 20px;">
-            <li>Start from any vertex</li>
-            <li>Select the smallest edge connecting to a new vertex</li>
-            <li>Repeat until all vertices are included</li>
-        </ol>
+        <strong>Prim’s Algorithm:</strong>
+        <ul>
+            <li>Starts from a vertex</li>
+            <li>Adds smallest connecting edge</li>
+            <li>Expands the tree</li>
+        </ul>
 
         <br>
 
-        <p>
-            MST is widely used in network design, optimization, routing systems,
-            and clustering problems.
-        </p>
+        <strong>Kruskal’s Algorithm:</strong>
+        <ul>
+            <li>Sorts edges by weight</li>
+            <li>Adds smallest edges first</li>
+            <li>Avoids cycles using Union-Find</li>
+        </ul>
+
     </div>
 
 </div>
