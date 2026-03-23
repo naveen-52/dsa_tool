@@ -1,3 +1,4 @@
+"""
 from flask import Flask, render_template, request
 import matplotlib.pyplot as plt
 import matplotlib
@@ -787,4 +788,5 @@ def huffman_encode():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True) 
+    """

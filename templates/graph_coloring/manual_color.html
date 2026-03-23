@@ -23,34 +23,131 @@
 
     <div class="alert alert-info">
         <i class="fas fa-info-circle"></i>
-        <span>Choose how many colors you'd like to use. The system will generate all valid colorings.</span>
+        <span>Choose how many colors you'd like to use. Then assign colors to each vertex.</span>
     </div>
 
     <form action="/graph-coloring/manual-process" method="POST">
+
         <input type="hidden" name="num_vertices" value="{{ num_vertices }}">
+
         {% for i in range(num_vertices) %}
             {% for j in range(num_vertices) %}
                 <input type="hidden" name="cell_{{ i }}_{{ j }}" value="{{ matrix[i][j] }}">
             {% endfor %}
         {% endfor %}
 
+        <!-- NUMBER OF COLORS -->
         <div class="form-group">
             <label class="form-label" for="num_colors">Number of Colors</label>
-            <input type="number" id="num_colors" name="num_colors" class="form-input"
-                   min="{{ num_vertices }}" max="10" required
-                   placeholder="Enter number of colors (minimum {{ num_vertices }})">
+
+            <input type="number"
+                   id="num_colors"
+                   name="num_colors"
+                   class="form-input"
+                   min="1"
+                   max="{{ num_vertices }}"
+                   required
+                   placeholder="Enter number of colors">
+
+            <button type="button"
+                    class="btn btn-secondary"
+                    style="margin-top:10px"
+                    onclick="generateSelectors()">
+
+                Generate Vertex Color Options
+            </button>
         </div>
 
+        <!-- DYNAMIC VERTEX COLOR SELECTORS -->
+        <div id="vertexSelectors"></div>
+
         <div class="action-buttons">
+
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-palette"></i>
                 Generate Colorings
             </button>
-            <a href="/graph-coloring" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i>
-                Back
-            </a>
+
+            <a href="/graph-coloring/graph" class="btn btn-secondary">
+← Back to Graph
+</a>
+
         </div>
+
     </form>
 </div>
+
+
+<script>
+const numVertices = Number("{{ num_vertices }}");
+const container = document.getElementById("vertexSelectors");
+
+function generateSelectors(){
+
+    const k = document.getElementById("num_colors").value;
+
+    if(!k) return;
+
+    container.innerHTML = "";
+
+    for(let i=0;i<numVertices;i++){
+
+        let html = `
+        <div class="form-group">
+        <label class="form-label">Vertex ${i+1}</label>
+
+        <select name="color_${i}" 
+                class="form-input vertex-select"
+                onchange="updateOptions()">
+        `;
+
+        for(let c=1;c<=k;c++){
+           const colorList = [
+  "#ef4444","#22c55e","#3b82f6","#eab308",
+  "#a855f7","#f97316","#14b8a6","#ec4899",
+  "#6366f1","#84cc16","#f43f5e","#0ea5e9",
+  "#9333ea","#10b981","#f59e0b","#64748b"
+];
+
+html += `
+<option value="${c}" style="background:${colorList[c % colorList.length]}; color:#fff;">
+    Color ${c}
+</option>`;
+        }
+
+        html += `</select></div>`;
+
+        container.innerHTML += html;
+    }
+}
+
+function updateOptions(){
+
+    const selects = document.querySelectorAll(".vertex-select");
+
+    let usedColors = [];
+
+    selects.forEach(s=>{
+        if(s.value) usedColors.push(s.value);
+    });
+
+    selects.forEach(select=>{
+
+        let current = select.value;
+
+        Array.from(select.options).forEach(opt=>{
+
+            if(opt.value !== current && usedColors.includes(opt.value)){
+                opt.style.display="none";
+            } else {
+                opt.style.display="block";
+            }
+
+        });
+
+    });
+
+}
+</script>
+
 {% endblock %}

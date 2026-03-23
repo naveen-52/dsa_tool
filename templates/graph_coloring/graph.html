@@ -12,12 +12,10 @@
 
 {% block content %}
 <style>
-/* ---------- PAGE ---------- */
 .page-header { margin-bottom: 28px; }
 .page-title { font-size: 30px; font-weight: 700; }
 .page-subtitle { color: #6b7280; font-size: 14px; max-width: 840px; }
 
-/* ---------- CARD ---------- */
 .card {
     background: #ffffff;
     border-radius: 16px;
@@ -33,7 +31,6 @@
     background: #f9fafb;
 }
 
-/* ---------- TOGGLE ---------- */
 .view-toggle {
     display: inline-flex;
     background: #eef2ff;
@@ -57,7 +54,6 @@
     color: #ffffff;
 }
 
-/* ---------- CANVAS ---------- */
 .graph-wrapper {
     display: flex;
     justify-content: center;
@@ -69,29 +65,14 @@
     overflow: hidden;
 }
 
-.graph-wrapper.interactive {
-    cursor: grab;
-}
-.graph-wrapper.interactive.dragging {
-    cursor: grabbing;
-}
+.graph-wrapper.interactive { cursor: grab; }
+.graph-wrapper.interactive.dragging { cursor: grabbing; }
 
-svg {
-    width: 720px;
-    height: 720px;
-}
+svg { width: 720px; height: 720px; }
 
-/* ---------- VISUALS ---------- */
-.edge {
-    stroke: #c7cdd8;
-    stroke-width: 2;
-}
+.edge { stroke: #302f2f; stroke-width: 2; }
 
-.node {
-    fill: #4f46e5;
-    stroke: #3730a3;
-    stroke-width: 3;
-}
+.node { fill: #4f46e5; stroke: #3730a3; stroke-width: 3; }
 
 .node-label {
     fill: #ffffff;
@@ -102,7 +83,6 @@ svg {
     pointer-events: none;
 }
 
-/* ---------- LEGEND ---------- */
 .legend {
     display: flex;
     gap: 20px;
@@ -116,7 +96,6 @@ svg {
     gap: 6px;
 }
 
-/* ---------- ACTIONS ---------- */
 .action-buttons {
     display: flex;
     gap: 12px;
@@ -154,7 +133,6 @@ svg {
 
         <div class="view-toggle">
             <button id="staticBtn" class="toggle-btn active">Static</button>
-            <button id="interactiveBtn" class="toggle-btn">Interactive</button>
         </div>
 
         <div id="wrapper" class="graph-wrapper">
@@ -170,40 +148,37 @@ svg {
 
 <div class="card">
     <div class="action-buttons">
-        <form action="/graph-coloring/chromatic" method="POST">
+
+        <!-- Chromatic Number -->
+        <form action="{{ url_for('graph.graph_coloring_chromatic') }}" method="POST">
             <input type="hidden" name="num_vertices" value="{{ num_vertices }}">
             {% for i in range(num_vertices) %}
                 {% for j in range(num_vertices) %}
                     <input type="hidden" name="cell_{{ i }}_{{ j }}" value="{{ matrix[i][j] }}">
                 {% endfor %}
             {% endfor %}
-            <button class="btn btn-primary">Find Chromatic </button>
+            <button class="btn btn-primary">Find Chromatic</button>
         </form>
-          <form action="/graph-coloring/chromatic-index" method="POST">
-      <input type="hidden" name="num_vertices" value="{{ num_vertices }}">
-      {% for i in range(num_vertices) %}
-        {% for j in range(num_vertices) %}
-          <input type="hidden"
-                 name="cell_{{ i }}_{{ j }}"
-                 value="{{ matrix[i][j] }}">
-        {% endfor %}
-      {% endfor %}
-    </form>
-        <a href="/graph-coloring" class="btn btn-secondary">Start Over</a>
+
+        <!-- Manual Coloring -->
+        <a href="{{ url_for('graph.graph_coloring_manual') }}" class="btn btn-primary">
+    Manual Coloring
+</a>
+
+       <a href="/graph-coloring" class="btn btn-secondary">
+    ← Back
+</a>
     </div>
 </div>
 
 <script>
-const matrix = {{ matrix | tojson }};
-const n = {{ num_vertices }};
+const matrix = JSON.parse('{{ matrix | tojson }}');
+const n = Number('{{ num_vertices }}');
 const svg = document.getElementById("svg");
 const wrapper = document.getElementById("wrapper");
 
 let mode = "static";
 
-/* =======================
-   STATIC 2D (TEXTBOOK)
-======================= */
 const CENTER = 360;
 const RADIUS_2D = 260;
 
@@ -250,131 +225,7 @@ function renderStatic() {
     });
 }
 
-/* =======================
-   INTERACTIVE 3D
-======================= */
-let rotX=0.6, rotY=0.6, velX=0, velY=0;
-let zoom=900;
-const SPHERE=260, FOV=900;
-let dragging=false,lastX=0,lastY=0;
-
-const nodes3D=[];
-for (let i=0;i<n;i++){
-    const phi=Math.acos(1-2*(i+0.5)/n);
-    const theta=Math.PI*(1+Math.sqrt(5))*i;
-    nodes3D.push({
-        x:SPHERE*Math.cos(theta)*Math.sin(phi),
-        y:SPHERE*Math.sin(theta)*Math.sin(phi),
-        z:SPHERE*Math.cos(phi)
-    });
-}
-
-let edges=[], nodes=[], labels=[];
-
-function init3D(){
-    svg.innerHTML="";
-    edges=[]; nodes=[]; labels=[];
-
-    for (let i=0;i<n;i++){
-        for (let j=i+1;j<n;j++){
-            if(matrix[i][j]){
-                const l=document.createElementNS("http://www.w3.org/2000/svg","line");
-                l.classList.add("edge");
-                svg.appendChild(l);
-                edges.push({l,i,j});
-            }
-        }
-    }
-
-    nodes3D.forEach((_,i)=>{
-        const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
-        c.classList.add("node");
-        svg.appendChild(c);
-        nodes.push(c);
-
-        const t=document.createElementNS("http://www.w3.org/2000/svg","text");
-        t.textContent=i+1;
-        t.classList.add("node-label");
-        svg.appendChild(t);
-        labels.push(t);
-    });
-}
-
-function project(p){
-    let y=p.y*Math.cos(rotX)-p.z*Math.sin(rotX);
-    let z=p.y*Math.sin(rotX)+p.z*Math.cos(rotX);
-    let x=p.x*Math.cos(rotY)+z*Math.sin(rotY);
-    z=-p.x*Math.sin(rotY)+z*Math.cos(rotY);
-    const s=FOV/(FOV+z+zoom);
-    return {x:CENTER+x*s,y:CENTER+y*s,s};
-}
-
-function render3D(){
-    if(mode!=="interactive") return;
-
-    const p=nodes3D.map(project);
-
-    edges.forEach(e=>{
-        e.l.setAttribute("x1",p[e.i].x);
-        e.l.setAttribute("y1",p[e.i].y);
-        e.l.setAttribute("x2",p[e.j].x);
-        e.l.setAttribute("y2",p[e.j].y);
-    });
-
-    p.forEach((pt,i)=>{
-        nodes[i].setAttribute("cx",pt.x);
-        nodes[i].setAttribute("cy",pt.y);
-        nodes[i].setAttribute("r",22*pt.s);
-        labels[i].setAttribute("x",pt.x);
-        labels[i].setAttribute("y",pt.y);
-        labels[i].style.fontSize=`${15*pt.s}px`;
-    });
-
-    rotY+=0.002; /* auto-rotation */
-    rotX+=velX; rotY+=velY;
-    velX*=0.92; velY*=0.92;
-
-    requestAnimationFrame(render3D);
-}
-
-/* =======================
-   TOGGLE + INPUT
-======================= */
-staticBtn.onclick=()=>{
-    mode="static";
-    wrapper.classList.remove("interactive");
-    staticBtn.classList.add("active");
-    interactiveBtn.classList.remove("active");
-    renderStatic();
-};
-
-interactiveBtn.onclick=()=>{
-    mode="interactive";
-    wrapper.classList.add("interactive");
-    interactiveBtn.classList.add("active");
-    staticBtn.classList.remove("active");
-    init3D();
-    render3D();
-};
-
-wrapper.addEventListener("mousedown",e=>{
-    if(mode!=="interactive") return;
-    dragging=true; lastX=e.clientX; lastY=e.clientY;
-});
-window.addEventListener("mouseup",()=>dragging=false);
-window.addEventListener("mousemove",e=>{
-    if(!dragging||mode!=="interactive")return;
-    velY=(e.clientX-lastX)*0.002;
-    velX=(e.clientY-lastY)*0.002;
-    lastX=e.clientX; lastY=e.clientY;
-});
-wrapper.addEventListener("wheel",e=>{
-    if(mode!=="interactive")return;
-    zoom+=e.deltaY*0.6;
-    zoom=Math.max(300,Math.min(1600,zoom));
-});
-
-/* INIT */
 renderStatic();
 </script>
+
 {% endblock %}

@@ -3,12 +3,10 @@
 
 {% block content %}
 <style>
-/* ---------- HEADER ---------- */
 .page-header { margin-bottom: 32px; }
 .page-title { font-size: 32px; font-weight: 800; }
 .page-subtitle { color: #6b7280; font-size: 15px; max-width: 720px; }
 
-/* ---------- TOGGLE ---------- */
 .view-toggle {
   display: inline-flex;
   background: #f3f4f6;
@@ -32,7 +30,6 @@
   color: #ffffff;
 }
 
-/* ---------- CARD ---------- */
 .card {
   background: #ffffff;
   border-radius: 18px;
@@ -41,7 +38,6 @@
   margin-bottom: 28px;
 }
 
-/* ---------- RESULT ---------- */
 .result-box {
   display: flex;
   justify-content: space-between;
@@ -61,14 +57,12 @@
   color: #4f46e5;
 }
 
-/* ---------- SLIDER ---------- */
 .slider-container {
   position: relative;
   max-width: 760px;
   margin: 0 auto;
 }
 
-/* NEW: Coloring Label */
 .coloring-label {
   text-align: center;
   font-weight: 600;
@@ -128,7 +122,7 @@
   <button class="toggle-btn" id="edgeBtn">Chromatic Index</button>
 </div>
 
-<!-- ================= VERTEX SECTION ================= -->
+<!-- VERTEX SECTION -->
 <div id="vertexSection" class="section active">
 
   <div class="card">
@@ -142,9 +136,10 @@
   <div class="card">
     <h3 class="card-title">Vertex Colorings</h3>
 
+    {% if graphs and graphs|length > 0 %}
+
     <div class="slider-container">
 
-      <!-- NEW: Dynamic Label -->
       <div id="coloringLabel" class="coloring-label">
         Coloring 1 of {{ graphs|length }}
       </div>
@@ -157,11 +152,36 @@
 
       <button class="slider-nav slider-prev" id="prevBtn">‹</button>
       <button class="slider-nav slider-next" id="nextBtn">›</button>
+
     </div>
+
+    {% else %}
+
+    <div style="text-align:center;padding:40px;color:#6b7280">
+      No vertex coloring visualization generated.
+    </div>
+
+    {% endif %}
+
   </div>
+  <div class="action-buttons">
+
+<a href="/graph-coloring/graph" class="btn btn-secondary">
+← Back to Graph
+</a>
+
+<a href="/graph-coloring" class="btn btn-primary">
+Try Another Graph
+</a>
+
+<a href="/" class="btn btn-secondary">
+Home
+</a>
+
+</div>
 </div>
 
-<!-- ================= EDGE SECTION ================= -->
+<!-- EDGE SECTION -->
 <div id="edgeSection" class="section">
 
   <div class="card">
@@ -174,14 +194,40 @@
 
   <div class="card">
     <h3 class="card-title">Edge Colored Graph</h3>
+
+    {% if edge_graph_url %}
     <div style="text-align:center">
       <img src="data:image/png;base64,{{ edge_graph_url }}"
            style="max-width:100%; max-height:420px;">
     </div>
+    {% else %}
+    <div style="text-align:center;padding:40px;color:#6b7280">
+      No edges exist in the graph.
+    </div>
+    {% endif %}
+
   </div>
+
+  <div class="action-buttons">
+
+<a href="/graph-coloring/graph" class="btn btn-secondary">
+← Back to Graph
+</a>
+
+<a href="/graph-coloring" class="btn btn-primary">
+Try Another Graph
+</a>
+
+<a href="/" class="btn btn-secondary">
+Home
+</a>
+
+</div>
+
 </div>
 
 <script>
+
 const vertexBtn = document.getElementById("vertexBtn");
 const edgeBtn = document.getElementById("edgeBtn");
 const vertexSection = document.getElementById("vertexSection");
@@ -201,10 +247,13 @@ edgeBtn.onclick = () => {
   vertexSection.classList.remove("active");
 };
 
-const graphImages = {{ graphs | tojson }};
+const graphImages = JSON.parse('{{ graphs | default([]) | tojson | safe }}');
 let index = 0;
+
 const img = document.getElementById("vertexImage");
 const label = document.getElementById("coloringLabel");
+
+if(graphImages.length > 1){
 
 document.getElementById("prevBtn").onclick = () => {
   index = (index - 1 + graphImages.length) % graphImages.length;
@@ -216,17 +265,23 @@ document.getElementById("nextBtn").onclick = () => {
   update();
 };
 
+}
+
 function update() {
   img.classList.remove("visible");
+
   setTimeout(() => {
     img.src = "data:image/png;base64," + graphImages[index];
     img.classList.add("visible");
 
-    // NEW: Update Label
-    label.textContent = "Coloring " + (index + 1) + " of " + graphImages.length;
+    if(label){
+      label.textContent =
+      "Coloring " + (index + 1) + " of " + graphImages.length;
+    }
 
-  }, 120);
+  },120);
 }
+
 </script>
 
 {% endblock %}

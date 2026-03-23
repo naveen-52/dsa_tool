@@ -11,46 +11,160 @@
 {% endblock %}
 
 {% block content %}
+
+<style>
+
+.page-header{margin-bottom:28px;}
+
+.page-title{
+font-size:30px;
+font-weight:700;
+}
+
+.page-subtitle{
+color:#6b7280;
+font-size:14px;
+}
+
+.card{
+background:#fff;
+border-radius:16px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+padding:28px;
+margin-bottom:28px;
+}
+
+.result-box{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:linear-gradient(135deg,#eef2ff,#f5f3ff);
+border-radius:14px;
+padding:18px 22px;
+}
+
+.result-box strong{
+font-size:28px;
+color:#4f46e5;
+}
+
+.graph-frame{
+height:420px;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#f9fafb;
+border-radius:14px;
+border:1px solid #e5e7eb;
+}
+
+.graph-frame img{
+max-width:100%;
+max-height:100%;
+object-fit:contain;
+}
+
+.action-buttons{
+display:flex;
+gap:12px;
+justify-content:flex-end;
+}
+
+.btn{
+padding:10px 18px;
+border-radius:10px;
+font-size:14px;
+font-weight:600;
+border:none;
+cursor:pointer;
+}
+
+.btn-primary{
+background:linear-gradient(135deg,#6366f1,#4f46e5);
+color:#fff;
+}
+
+.btn-secondary{
+background:#f3f4f6;
+color:#374151;
+border:1px solid #e5e7eb;
+}
+
+.valid{color:#16a34a;font-weight:700;}
+.invalid{color:#dc2626;font-weight:700;}
+
+</style>
+
+
 <div class="page-header">
-    <h1 class="page-title">Manual Coloring Results</h1>
-    <p class="page-subtitle">All valid colorings with your specified number of colors.</p>
+<h1 class="page-title">Manual Coloring Result</h1>
+<p class="page-subtitle">
+Visualization of the coloring you selected.
+</p>
 </div>
 
+
+<!-- RESULT STATUS -->
+
 <div class="card">
-    <div class="alert alert-success">
-        <i class="fas fa-check-circle"></i>
-        <span>Successfully generated {{ graphs|length }} valid color combinations!</span>
-    </div>
+
+<div class="result-box">
+
+<span>Coloring Status</span>
+
+<strong class="{% if valid %}valid{% else %}invalid{% endif %}">
+
+{% if valid %}
+Valid Coloring
+{% else %}
+Invalid Coloring
+{% endif %}
+
+</strong>
+
 </div>
 
-<div class="card">
-    <h3 class="card-title">Generated Colorings</h3>
-
-    <div class="graph-grid">
-        {% for graph_url in graphs[:12] %}
-        <div class="graph-item">
-            <img src="data:image/png;base64,{{ graph_url }}" alt="Manual Coloring {{ loop.index }}">
-        </div>
-        {% endfor %}
-    </div>
-
-    {% if graphs|length > 12 %}
-    <p class="card-description" style="margin-top: 20px;">
-        <i class="fas fa-info-circle"></i> Showing first 12 of {{ graphs|length }} total combinations.
-    </p>
-    {% endif %}
 </div>
 
+
+<!-- GRAPH VIEWER -->
+
 <div class="card">
+
+<h3 class="card-title">Colored Graph</h3>
+
+<div class="graph-frame">
+
+<img src="data:image/png;base64,{{ graph }}">
+
+</div>
+
+</div>
+
+
+<!-- ACTION BUTTONS -->
+
+<div class="card">
+
     <div class="action-buttons">
+
+        <!-- BACK TO GRAPH -->
+        <a href="/graph-coloring/graph" class="btn btn-secondary">
+            ← Back to Graph
+        </a>
+
+        <!-- TRY NEW GRAPH -->
         <a href="/graph-coloring" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
             Try Another Graph
         </a>
+
+        <!-- HOME -->
         <a href="/" class="btn btn-secondary">
-            <i class="fas fa-home"></i>
-            Back to Dashboard
+            Home
         </a>
+
     </div>
+
 </div>
+
 {% endblock %}

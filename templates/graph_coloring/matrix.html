@@ -219,6 +219,10 @@
         </div>
 
         <div class="action-buttons">
+            <button type="button" id="autoFill" class="btn btn-secondary">
+<i class="fas fa-random"></i>
+Auto Fill
+</button>
             <button type="button" id="resetMatrix" class="btn btn-danger">
                 <i class="fas fa-undo"></i>
                 Reset Matrix
@@ -239,68 +243,97 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const cells = Array.from(document.querySelectorAll('.matrix-cell'));
+document.addEventListener('DOMContentLoaded', () => {
 
-        const getCell = (i, j) =>
-            cells.find(c => c.dataset.i === i && c.dataset.j === j);
+    const n = Number("{{ num_vertices }}");
+    const cells = Array.from(document.querySelectorAll('.matrix-cell'));
 
-        const updateCell = (cell, value) => {
-            const hidden = cell.nextElementSibling;
-            cell.dataset.value = value;
-            cell.textContent = value;
-            hidden.value = value;
-            cell.classList.toggle('active', Number(value) === 1);
-        };
+    const getCell = (i, j) =>
+        cells.find(c => c.dataset.i === String(i) && c.dataset.j === String(j));
+
+    const updateCell = (cell, value) => {
+        const hidden = cell.nextElementSibling;
+        cell.dataset.value = value;
+        cell.textContent = value;
+        hidden.value = value;
+        cell.classList.toggle('active', Number(value) === 1);
+    };
+
+    // ---------------- CLICK TO TOGGLE ----------------
+    cells.forEach(cell => {
+        const i = cell.dataset.i;
+        const j = cell.dataset.j;
+
+        if (i === j) return;
+
+        cell.addEventListener('click', () => {
+            if (cell.querySelector('input')) return;
+
+            const current = Number(cell.dataset.value) || 0;
+            const next = current === 1 ? 0 : 1;
+
+            updateCell(cell, next);
+            updateCell(getCell(j, i), next);
+        });
+
+        // ---------------- DOUBLE CLICK EDIT ----------------
+        cell.addEventListener('dblclick', () => {
+            if (cell.querySelector('input')) return;
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.value = cell.dataset.value;
+            input.className = 'matrix-edit-input';
+
+            cell.textContent = '';
+            cell.appendChild(input);
+            input.focus();
+
+            const commit = () => {
+                let value = input.value.trim();
+                if (value === '' || isNaN(value)) value = '0';
+
+                updateCell(cell, value);
+                updateCell(getCell(j, i), value);
+            };
+
+            input.addEventListener('blur', commit);
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') input.blur();
+                if (e.key === 'Escape') commit();
+            });
+        });
+    });
+
+    // ---------------- RESET MATRIX ----------------
+    document.getElementById('resetMatrix').addEventListener('click', () => {
+        cells.forEach(cell => updateCell(cell, 0));
+    });
+
+    // ---------------- AUTO FILL MATRIX (FULL GRAPH) ----------------
+    document.getElementById('autoFill').addEventListener('click', () => {
 
         cells.forEach(cell => {
+
             const i = cell.dataset.i;
             const j = cell.dataset.j;
 
-            if (i === j) return;
+            // diagonal = 0
+            if (i === j) {
+                updateCell(cell, 0);
+                return;
+            }
 
-            cell.addEventListener('click', () => {
-                if (cell.querySelector('input')) return;
+            // fill all edges = 1
+            updateCell(cell, 1);
 
-                const current = Number(cell.dataset.value) || 0;
-                const next = current === 1 ? 0 : 1;
-
-                updateCell(cell, next);
-                updateCell(getCell(j, i), next);
-            });
-
-            cell.addEventListener('dblclick', () => {
-                if (cell.querySelector('input')) return;
-
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.min = '0';
-                input.value = cell.dataset.value;
-                input.className = 'matrix-edit-input';
-
-                cell.textContent = '';
-                cell.appendChild(input);
-                input.focus();
-
-                const commit = () => {
-                    let value = input.value.trim();
-                    if (value === '' || isNaN(value)) value = '0';
-
-                    updateCell(cell, value);
-                    updateCell(getCell(j, i), value);
-                };
-
-                input.addEventListener('blur', commit);
-                input.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') input.blur();
-                    if (e.key === 'Escape') commit();
-                });
-            });
+            const mirror = getCell(j, i);
+            if (mirror) updateCell(mirror, 1);
         });
 
-        document.getElementById('resetMatrix').addEventListener('click', () => {
-            cells.forEach(cell => updateCell(cell, 0));
-        });
     });
+
+});
 </script>
 {% endblock %}
