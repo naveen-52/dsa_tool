@@ -617,3 +617,12 @@ body {
         padding: 20px;
     }
 }
+
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    border: 1px solid #fca5a5;
+}

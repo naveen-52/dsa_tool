@@ -41,13 +41,12 @@
             <label class="form-label" for="num_colors">Number of Colors</label>
 
             <input type="number"
-                   id="num_colors"
-                   name="num_colors"
-                   class="form-input"
-                   min="1"
-                   max="{{ num_vertices }}"
-                   required
-                   placeholder="Enter number of colors">
+       id="num_colors"
+       name="num_colors"
+       class="form-input"
+       
+       required
+       placeholder="Enter number of colors">
 
             <button type="button"
                     class="btn btn-secondary"
@@ -77,18 +76,58 @@
     </form>
 </div>
 
-
 <script>
 const numVertices = Number("{{ num_vertices }}");
 const container = document.getElementById("vertexSelectors");
+const inputField = document.getElementById("num_colors");
 
+// 🔥 CREATE ERROR DIV IF NOT EXISTS
+let errorDiv = document.getElementById("colorError");
+if (!errorDiv) {
+    errorDiv = document.createElement("div");
+    errorDiv.id = "colorError";
+    errorDiv.className = "alert alert-danger";
+    errorDiv.style.marginTop = "10px";
+    errorDiv.style.display = "none";
+    inputField.parentNode.appendChild(errorDiv);
+}
+
+// ==========================
+// 🔥 GENERATE SELECTORS
+// ==========================
 function generateSelectors(){
 
-    const k = document.getElementById("num_colors").value;
+    const k = parseInt(inputField.value);
 
-    if(!k) return;
+    // RESET ERROR
+    errorDiv.style.display = "none";
+    errorDiv.textContent = "";
+
+    // ❌ VALIDATION
+    if(!k || isNaN(k)){
+        errorDiv.textContent = "Please enter a valid number.";
+        errorDiv.style.display = "block";
+        return;
+    }
+
+    // ✅ ONLY CONDITION (EQUALITY)
+    if(k !== numVertices){
+        errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        You must enter exactly ${numVertices} colors
+        `;
+        errorDiv.style.display = "block";
+        return;
+    }
 
     container.innerHTML = "";
+
+    const colorList = [
+        "#ef4444","#22c55e","#3b82f6","#eab308",
+        "#a855f7","#f97316","#14b8a6","#ec4899",
+        "#6366f1","#84cc16","#f43f5e","#0ea5e9",
+        "#9333ea","#10b981","#f59e0b","#64748b"
+    ];
 
     for(let i=0;i<numVertices;i++){
 
@@ -102,17 +141,10 @@ function generateSelectors(){
         `;
 
         for(let c=1;c<=k;c++){
-           const colorList = [
-  "#ef4444","#22c55e","#3b82f6","#eab308",
-  "#a855f7","#f97316","#14b8a6","#ec4899",
-  "#6366f1","#84cc16","#f43f5e","#0ea5e9",
-  "#9333ea","#10b981","#f59e0b","#64748b"
-];
-
-html += `
-<option value="${c}" style="background:${colorList[c % colorList.length]}; color:#fff;">
-    Color ${c}
-</option>`;
+            html += `
+            <option value="${c}" style="background:${colorList[c % colorList.length]}; color:#fff;">
+                Color ${c}
+            </option>`;
         }
 
         html += `</select></div>`;
@@ -121,6 +153,9 @@ html += `
     }
 }
 
+// ==========================
+// 🔥 UPDATE OPTIONS (NO CHANGE)
+// ==========================
 function updateOptions(){
 
     const selects = document.querySelectorAll(".vertex-select");
@@ -148,6 +183,39 @@ function updateOptions(){
     });
 
 }
+
+// ==========================
+// 🔥 LIVE VALIDATION (FIXED)
+// ==========================
+inputField.addEventListener("input", function(){
+
+    const value = parseInt(this.value);
+
+    errorDiv.style.display = "none";
+
+    if(!this.value){
+        errorDiv.textContent = "Number of colors is required.";
+        errorDiv.style.display = "block";
+        return;
+    }
+
+    if(isNaN(value)){
+        errorDiv.textContent = "Enter a valid number.";
+        errorDiv.style.display = "block";
+        return;
+    }
+
+    // ✅ FIXED: correct variable + equality logic
+    if(value !== numVertices){
+        errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        Must be exactly ${numVertices} colors
+        `;
+        errorDiv.style.display = "block";
+        return;
+    }
+
+});
 </script>
 
 {% endblock %}
