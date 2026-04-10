@@ -2,65 +2,110 @@
 
 {% block title %}Huffman Coding - AlgoViz Pro{% endblock %}
 
-{% block breadcrumbs %}
-<span>Home</span>
-<i class="fas fa-chevron-right breadcrumb-separator"></i>
-<span>Huffman Coding</span>
-{% endblock %}
-
 {% block content %}
-<div class="page-header">
-    <h1 class="page-title">Huffman Coding Algorithm</h1>
-    <p class="page-subtitle">Generate optimal binary codes for data compression using Huffman encoding.</p>
-</div>
+<div class="huffman-container">
 
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Enter Your Text</h3>
-        <div class="card-icon">
-            <i class="fas fa-code"></i>
-        </div>
+    <div class="huffman-hero">
+        <h1 class="huffman-title">Huffman Coding</h1>
+        <p class="huffman-subtitle">Optimal Variable-Length Compression</p>
     </div>
 
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i>
-        <span>Enter any text to analyze character frequencies and generate Huffman codes.</span>
-    </div>
-
-    <form action="/huffman/encode" method="POST">
-        <div class="form-group">
-            <label class="form-label" for="text_input">Input Text</label>
-            <textarea id="text_input" name="text_input" class="form-textarea"
-                      required placeholder="Enter text here (e.g., banana, hello world, etc.)"></textarea>
-        </div>
-
-        <div class="action-buttons">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-compress"></i>
-                Generate Huffman Codes
+    <div class="huffman-tool-card" style="margin-top:20px; padding:30px; background:#1e293b; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+        <textarea 
+            id="text_input" 
+            placeholder="Enter text to encode or decode..." 
+            style="width: 100%; height: 120px; padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2); color: white; margin-bottom: 20px; font-size:16px;"
+            autocomplete="off"
+        ></textarea>
+        
+        <div style="display:flex; gap:15px; align-items:center;">
+            <button id="btn_animate" class="btn btn-primary" disabled style="padding: 12px 24px; font-weight:bold; transition:all 0.2s;">
+                <i class="fas fa-film" style="margin-right: 8px;"></i> Animate Step-by-Step
             </button>
-            <a href="/" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i>
-                Back to Dashboard
-            </a>
+            <button id="btn_encode" class="btn btn-secondary" disabled style="padding: 12px 24px; transition:all 0.2s;">
+                <i class="fas fa-lock" style="margin-right: 8px;"></i> Encode
+            </button>
+            <button id="btn_decode" class="btn btn-secondary" disabled style="padding: 12px 24px; transition:all 0.2s;">
+                <i class="fas fa-unlock" style="margin-right: 8px;"></i> Decode
+            </button>
         </div>
-    </form>
+    </div>
+
 </div>
 
-<div class="card">
-    <h3 class="card-title">About Huffman Coding</h3>
-    <div class="card-description">
-        <p><strong>Huffman Coding</strong> is a lossless data compression algorithm that assigns variable-length codes to characters based on their frequencies. More frequent characters get shorter codes, resulting in optimal compression.</p>
-        <br>
-        <p><strong>How it works:</strong></p>
-        <ol style="margin-left: 20px; line-height: 1.8;">
-            <li>Calculate the frequency of each character in the input</li>
-            <li>Build a binary tree with characters as leaves</li>
-            <li>Assign codes: 0 for left branches, 1 for right branches</li>
-            <li>Generate unique prefix-free codes for each character</li>
-        </ol>
-        <br>
-        <p>Huffman coding is widely used in file compression formats like ZIP, JPEG, and MP3.</p>
-    </div>
-</div>
+<script>
+    const textarea = document.getElementById('text_input');
+    const btnAnimate = document.getElementById('btn_animate');
+    const btnEncode = document.getElementById('btn_encode');
+    const btnDecode = document.getElementById('btn_decode');
+
+    textarea.addEventListener('input', () => {
+        const isEmpty = textarea.value.trim() === '';
+        btnAnimate.disabled = isEmpty;
+        btnEncode.disabled = isEmpty;
+        btnDecode.disabled = isEmpty;
+        
+        const opacity = isEmpty ? '0.5' : '1';
+        const cursor = isEmpty ? 'not-allowed' : 'pointer';
+        
+        [btnAnimate, btnEncode, btnDecode].forEach(btn => {
+            btn.style.opacity = opacity;
+            btn.style.cursor = cursor;
+        });
+    });
+    
+    // Trigger evaluation on load
+    textarea.dispatchEvent(new Event('input'));
+
+    btnEncode.addEventListener('click', async () => {
+        try {
+            const res = await fetch('/huffman/encode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: textarea.value.trim() })
+            });
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            
+            localStorage.setItem('huffman_result', JSON.stringify({ action: 'Encoding', ...data }));
+            window.location.href = '/huffman/result';
+        } catch (e) {
+            alert('Request Failed: ' + e.message);
+        }
+    });
+
+    btnDecode.addEventListener('click', async () => {
+        try {
+            const res = await fetch('/huffman/decode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ encoded: textarea.value.trim() })
+            });
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            
+            localStorage.setItem('huffman_result', JSON.stringify({ action: 'Decoding', output: data.decoded }));
+            window.location.href = '/huffman/result';
+        } catch (e) {
+            alert('Request Failed: ' + e.message);
+        }
+    });
+
+    btnAnimate.addEventListener('click', async () => {
+        try {
+            const res = await fetch('/huffman/encode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: textarea.value.trim() })
+            });
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            
+            localStorage.setItem('huffman_steps', JSON.stringify(data.steps));
+            window.location.href = '/huffman/visualize';
+        } catch (e) {
+            alert('Request Failed: ' + e.message);
+        }
+    });
+</script>
 {% endblock %}

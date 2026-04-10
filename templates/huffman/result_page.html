@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    .result-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #1e293b;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
+    .result-box {
+        background: #0f172a;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(99,102,241,0.3);
+        margin: 20px 0;
+        word-break: break-all;
+        font-size: 18px;
+        color: #38bdf8;
+    }
+    .codes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    .code-item {
+        background: rgba(255,255,255,0.05);
+        padding: 10px 15px;
+        border-radius: 6px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .code-char { font-weight: bold; color: #fbbf24; margin-right: 5px; }
+    .code-binary { color: #fff; }
+</style>
+
+<div class="result-container">
+    <h2 id="title">Parsing Output...</h2>
+    
+    <div style="margin-bottom: 20px;">
+        <a href="/huffman" class="btn btn-primary" style="padding: 10px 20px;">← Back</a>
+    </div>
+
+    <div class="result-box" id="output_box">
+        <strong id="output_label" style="color: #94a3b8; font-size: 14px; text-transform: uppercase;">Output:</strong>
+        <div id="output_text" style="margin-top: 10px; font-weight: 500;"></div>
+    </div>
+
+    <div id="mapping_section" style="display: none; margin-top: 40px;">
+        <h3 style="margin-bottom: 15px; font-size: 18px; color: #cbd5e1;">Character Mapping</h3>
+        <div id="codes_grid" class="codes-grid"></div>
+    </div>
+</div>
+
+<script>
+    const data = JSON.parse(localStorage.getItem('huffman_result') || '{}');
+    
+    if (data.action) {
+        document.getElementById('title').textContent = data.action + ' Result';
+        document.getElementById('output_label').textContent = (data.action === 'Encoding' ? 'Encoded Output' : 'Decoded Output');
+        document.getElementById('output_text').textContent = data.action === 'Encoding' ? data.encoded : data.output;
+    } else {
+        document.getElementById('title').textContent = 'No Data Found';
+        document.getElementById('output_text').textContent = 'Please encode or decode a string from the index page first.';
+    }
+
+    if (data.codes) {
+        document.getElementById('mapping_section').style.display = 'block';
+        const grid = document.getElementById('codes_grid');
+        for (const [char, code] of Object.entries(data.codes)) {
+            const div = document.createElement('div');
+            div.className = 'code-item';
+            div.innerHTML = `<span class="code-char">'${char === ' ' ? 'Space' : char}'</span> <span class="code-binary">${code}</span>`;
+            grid.appendChild(div);
+        }
+    }
+</script>
+{% endblock %}

@@ -356,13 +356,13 @@ body {
 }
 
 .btn {
-    padding: 12px 24px;
+    padding: 10px 18px;   /* FIXED */
     border-radius: 8px;
     border: none;
     font-weight: 500;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;  /* improved */
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -376,6 +376,7 @@ body {
 
 .btn-primary:hover {
     background-color: var(--primary-hover);
+    transform: translateY(-1px);   /* ADD */
 }
 
 .btn-secondary {
@@ -386,6 +387,22 @@ body {
 
 .btn-secondary:hover {
     background-color: var(--content-bg);
+    transform: translateY(-1px);   /* ADD */
+}
+
+/* ===== NEW BUTTON IMPROVEMENTS ===== */
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+.active-btn {
+    box-shadow: 0 0 0 2px #2563eb inset;
 }
 
 .form-group {
@@ -477,11 +494,13 @@ body {
 }
 
 .result-box {
+    margin-top: 15px;
+    padding: 14px 18px;
+    border-radius: 8px;
     background-color: rgba(37, 99, 235, 0.05);
     border-left: 4px solid var(--primary-color);
-    padding: 16px 20px;
-    border-radius: 8px;
-    margin: 20px 0;
+    font-family: monospace;
+    transition: all 0.2s ease;
 }
 
 .result-label {
@@ -626,3 +645,677 @@ body {
     font-size: 14px;
     border: 1px solid #fca5a5;
 }
+
+/* ===== BUTTON GROUP ===== */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+/* ===== CODES GRID ===== */
+.codes-grid {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.codes-grid p {
+    background: #f9fafb;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    font-family: monospace;
+    transition: all 0.2s ease;
+}
+
+.codes-grid p:hover {
+    background: #e0f2fe;
+    transform: scale(1.05);
+}
+
+/* ═══════════════════════════════════════════════════
+   DASHBOARD REDESIGN — AlgoViz Pro
+   ═══════════════════════════════════════════════════ */
+
+/* ── Section Typography ── */
+.section-header {
+    margin: 0 0 24px 0;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+
+/* ── Hero Section ── */
+.hero-section {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 72px 48px 64px;
+    text-align: center;
+    margin-bottom: 48px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Soft radial blue glow behind the hero */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    translate: -50% 0;
+    width: 700px;
+    height: 360px;
+    background: radial-gradient(ellipse at top, rgba(37, 99, 235, 0.07), transparent 70%);
+    pointer-events: none;
+}
+
+/* Decorative dot grid */
+.hero-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+}
+
+.hero-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-title {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-description {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 auto 36px auto;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+}
+
+/* hero-actions and hero-btn styles removed — buttons no longer used */
+
+
+/* ── Compact Hero Modifier ── */
+.hero-section.hero-compact {
+    padding: 48px 48px 40px;
+    margin-bottom: 32px;
+}
+
+.hero-section.hero-compact .hero-description {
+    margin-bottom: 0;
+}
+
+
+/* ── Quick Actions Grid ── */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+}
+
+.tool-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    position: relative;
+    cursor: pointer;
+}
+
+.tool-card:hover {
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.12),
+                0 4px 8px -2px rgba(15, 23, 42, 0.06);
+}
+
+.tool-card:active {
+    transform: translateY(-2px) scale(1.005);
+    transition-duration: 0.1s;
+}
+
+.tool-card:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Per-card accent border on hover */
+.tool-card#tool-graph-coloring:hover {
+    border-color: #818cf8;
+    background: linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
+}
+.tool-card#tool-mst:hover {
+    border-color: #4ade80;
+    background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+}
+.tool-card#tool-huffman:hover {
+    border-color: #fbbf24;
+    background: linear-gradient(180deg, #ffffff 0%, #fffbeb 100%);
+}
+
+.tool-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tool-card:hover .tool-icon-wrapper {
+    transform: scale(1.12) rotate(-3deg);
+}
+
+.tool-icon-wrapper.graph-coloring {
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    color: #4f46e5;
+}
+
+.tool-icon-wrapper.mst {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #16a34a;
+}
+
+.tool-icon-wrapper.huffman {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #d97706;
+}
+
+.tool-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.tool-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+}
+
+.tool-description {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Arrow indicator — always visible but animates on hover */
+.tool-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    flex-shrink: 0;
+    opacity: 0.35;
+    transform: translateX(0);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    background: var(--content-bg);
+}
+
+.tool-card:hover .tool-arrow {
+    opacity: 1;
+    transform: translateX(4px);
+    color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.08);
+}
+
+
+/* ═══════════════════════════════════════════════════
+   CONTINUE WHERE YOU LEFT OFF
+   ═══════════════════════════════════════════════════ */
+.recent-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 28px;
+    margin-top: 0;
+}
+
+.recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.recent-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.recent-item:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateX(4px);
+}
+
+.recent-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+/* Reuse same color scheme for recent icons */
+.recent-icon-wrapper.graph-coloring {
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    color: #4f46e5;
+}
+.recent-icon-wrapper.mst {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #16a34a;
+}
+.recent-icon-wrapper.huffman {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #d97706;
+}
+
+.recent-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.recent-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.recent-time {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.recent-chevron {
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.2s ease;
+}
+
+.recent-item:hover .recent-chevron {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--primary-color);
+}
+
+.recent-empty {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-secondary);
+}
+
+.recent-empty i {
+    font-size: 28px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+    display: block;
+}
+
+.recent-empty p {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* ── Dashboard Responsive ── */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 48px 24px 40px;
+        border-radius: 16px;
+    }
+    .hero-section.hero-compact {
+        padding: 36px 24px 28px;
+    }
+    .hero-title {
+        font-size: 28px;
+    }
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 36px 16px 32px;
+    }
+    .hero-section.hero-compact {
+        padding: 28px 16px 24px;
+    }
+    .hero-title {
+        font-size: 24px;
+    }
+    .hero-description {
+        font-size: 14px;
+    }
+    .tool-arrow {
+        display: none;
+    }
+}
+
+/* ═══════════════════════════════════════════════════
+   HUFFMAN CODING VISUALIZATION PAGE
+   ═══════════════════════════════════════════════════ */
+
+.huffman-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 0 60px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+/* A. HERO SECTION */
+.huffman-hero {
+    text-align: center;
+    padding: 40px 20px 20px 20px;
+}
+
+.huffman-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+}
+
+.huffman-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* B. INPUT TOOL SECTION */
+.huffman-tool-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.15),
+                0 4px 6px -2px rgba(15, 23, 42, 0.05);
+    border: 1px solid rgba(37, 99, 235, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.huffman-tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.huffman-tool-header {
+    margin-bottom: 24px;
+}
+
+.huffman-tool-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.huffman-tool-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.huffman-textarea {
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 16px;
+    font-size: 16px;
+    min-height: 140px;
+    transition: all 0.2s ease;
+    resize: vertical;
+}
+
+.huffman-textarea:focus {
+    background: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.huffman-action {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.huffman-btn-generate {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    transition: all 0.2s ease;
+}
+
+.huffman-btn-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+/* C. THEORY SECTION */
+.section-heading {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+}
+
+.theory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+}
+
+.theory-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02);
+    transition: transform 0.2s ease;
+}
+
+.theory-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.08);
+}
+
+.theory-icon {
+    width: 40px;
+    height: 40px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+}
+
+.theory-card h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.theory-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 0px;
+}
+
+.theory-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.theory-list li {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+}
+
+.theory-list li::before {
+    content: '•';
+    color: #3b82f6;
+    font-weight: bold;
+}
+
+/* D. CODE SECTION */
+.huffman-code-section {
+    margin-bottom: 20px;
+}
+
+.code-card {
+    background: #1e293b;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+}
+
+.code-header {
+    background: #0f172a;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.code-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.code-dot.red { background: #ef4444; }
+.code-dot.yellow { background: #f59e0b; }
+.code-dot.green { background: #10b981; }
+
+.code-filename {
+    margin-left: 12px;
+    color: #94a3b8;
+    font-size: 13px;
+    font-family: monospace;
+}
+
+.code-card pre {
+    margin: 0;
+    padding: 24px;
+    overflow-x: auto;
+}
+
+.code-card code {
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #e2e8f0;
+}
+
+/* Python basic highlighting for plain text code block */
+.code-card .keyword { color: #c678dd; }
+.code-card .function { color: #61afef; }
+.code-card .string { color: #98c379; }
+.code-card .comment { color: #5c6370; font-style: italic; }
+.code-card .operator { color: #56b6c2; }
+.code-card .number { color: #d19a66; }
+
+@media (max-width: 768px) {
+    .huffman-container {
+        padding: 0px 0 40px 0;
+        gap: 32px;
+    }
+    .huffman-title {
+        font-size: 28px;
+    }
+    .huffman-tool-card {
+        padding: 24px;
+    }
+}
+

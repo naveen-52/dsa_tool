@@ -80,6 +80,40 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.06);
 }
 
+/* 🔥 FLOW ANIMATION */
+#flow-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(0,255,0,0.2),
+        rgba(0,255,0,0.2) 10px,
+        rgba(0,255,0,0.05) 10px,
+        rgba(0,255,0,0.05) 20px
+    );
+
+    pointer-events: none;
+    opacity: 0;
+}
+
+.flow-active {
+    animation: flowMove 1s linear infinite;
+    opacity: 1;
+}
+
+@keyframes flowMove {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 40px 40px;
+    }
+}
+
 /* TABLE */
 .table-container {
     overflow-x: auto;
@@ -137,8 +171,6 @@
 
 <div class="page-header">
     <h1 class="page-title">Minimum Spanning Tree Results</h1>
-
-    <!-- FIXED: dynamic algorithm -->
     <p class="page-subtitle">
         Computed using <strong>{{ algorithm|capitalize }}</strong> Algorithm.
     </p>
@@ -159,8 +191,31 @@
         </span>
     </div>
 
+    <!-- STATIC GRAPH -->
     <div class="graph-wrapper">
-        <img src="data:image/png;base64,{{ graph_url }}" alt="MST Visualization">
+        {% if graph_image %}
+            <img src="data:image/png;base64,{{ graph_image }}" alt="MST Visualization">
+        {% else %}
+            <p>Graph not available</p>
+        {% endif %}
+    </div>
+
+    <!-- ANIMATION -->
+    <hr style="margin:30px 0;">
+
+    <h3 style="text-align:center;">MST Animation</h3>
+
+    <div style="display:flex; justify-content:center; margin-top:20px;">
+    <div style="position:relative; display:inline-block;">
+        <img id="animation-frame" width="500">
+        <div id="flow-overlay"></div>
+    </div>
+</div>
+
+    <div style="text-align:center; margin-top:15px;">
+        <button class="btn btn-secondary" onclick="prevStep()">⬅ Prev</button>
+        <button class="btn btn-primary" onclick="playAnimation()">▶ Play</button>
+        <button class="btn btn-secondary" onclick="nextStep()">Next ➡</button>
     </div>
 
 </div>
@@ -182,7 +237,6 @@
                 </tr>
             </thead>
             <tbody>
-
                 {% for edge in mst_edges %}
                 <tr>
                     <td>{{ chr(65 + edge[0]) }}</td>
@@ -190,7 +244,6 @@
                     <td>{{ edge[2] }}</td>
                 </tr>
                 {% endfor %}
-
             </tbody>
         </table>
     </div>
@@ -213,5 +266,55 @@
 
     </div>
 </div>
+
+<!-- JAVASCRIPT -->
+<script>
+let steps = JSON.parse('{{ step_images | tojson | safe if step_images else "[]" }}');
+let index = 0;
+let interval = null;
+
+function showStep() {
+    if (steps.length > 0) {
+        document.getElementById("animation-frame").src =
+            "data:image/png;base64," + steps[index];
+    }
+}
+
+function nextStep() {
+    if (index < steps.length - 1) {
+        index++;
+        showStep();
+    }
+}
+
+function prevStep() {
+    if (index > 0) {
+        index--;
+        showStep();
+    }
+}
+
+function playAnimation() {
+    if (interval) clearInterval(interval);
+
+    let overlay = document.getElementById("flow-overlay");
+    overlay.classList.add("flow-active");
+
+    interval = setInterval(() => {
+        if (index < steps.length - 1) {
+            index++;
+            showStep();
+        } else {
+            clearInterval(interval);
+            overlay.classList.remove("flow-active");
+            alert("Animation completed");
+        }
+    }, 1000);
+}
+
+window.onload = function() {
+    showStep();
+};
+</script>
 
 {% endblock %}

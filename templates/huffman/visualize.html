@@ -1,0 +1,322 @@
+{% extends "layout.html" %}
+
+{% block title %}Huffman Animator - AlgoViz Pro{% endblock %}
+
+{% block content %}
+<style>
+    .animator-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 30px;
+        background: #0f172a;
+        border-radius: 12px;
+        border: 1px solid rgba(99,102,241,0.2);
+        color: #f1f5f9;
+        font-family: 'Inter', sans-serif;
+    }
+    .animator-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 16px;
+    }
+    .controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+    .btn-ctrl {
+        background: #1e293b;
+        color: #fff;
+        border: 1px solid #475569;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .btn-ctrl:hover { background: #334155; }
+    .btn-play { background: #4f46e5; border-color: #6366f1; }
+    .btn-play:hover { background: #4338ca; }
+    .slider { width: 120px; }
+    
+    .status-panel {
+        font-size: 16px;
+        font-weight: bold;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+    }
+
+    .section-title {
+        font-size: 14px;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 12px;
+        letter-spacing: 1px;
+    }
+
+    .queue-area {
+        min-height: 100px;
+        background: #1e293b;
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 30px;
+        border: 1px dashed rgba(255,255,255,0.1);
+    }
+    
+    .tree-area {
+        min-height: 250px;
+        background: #1e293b;
+        border-radius: 10px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed rgba(255,255,255,0.1);
+    }
+
+    .h-node {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #3b82f6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transition: all 0.4s ease;
+        position: relative;
+        flex-shrink: 0;
+    }
+    .h-node.selected {
+        background: #ef4444; /* REQUIRED: RED SELECTION */
+        box-shadow: 0 0 16px #ef4444;
+        transform: scale(1.1);
+    }
+    .h-node.merged {
+        background: #10b981;
+    }
+    .n-char { font-size: 16px; }
+    .n-freq { font-size: 11px; color: rgba(255,255,255,0.8); margin-top:2px; }
+
+    .merge-visual {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: fadeIn 0.4s ease;
+    }
+    .merge-children {
+        display: flex;
+        gap: 40px;
+        margin-top: 30px;
+        position: relative;
+    }
+    .merge-children::before {
+        content: "";
+        position: absolute;
+        top: -30px;
+        left: 28px;
+        right: 28px;
+        height: 30px;
+        border-top: 2px solid rgba(255,255,255,0.3);
+        border-left: 2px solid rgba(255,255,255,0.3);
+        border-right: 2px solid rgba(255,255,255,0.3);
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="animator-container">
+    <div style="margin-bottom: 20px;">
+        <a href="/huffman" class="btn-ctrl" style="text-decoration:none;">← Back</a>
+    </div>
+
+    <div class="animator-header">
+        <h2 style="margin:0;">Interactive Visualizer</h2>
+        <div class="controls">
+            <button class="btn-ctrl" id="btn_prev">⏮ Prev</button>
+            <button class="btn-ctrl btn-play" id="btn_play">▶ Play</button>
+            <button class="btn-ctrl btn-play" id="btn_pause" style="display:none;">⏸ Pause</button>
+            <button class="btn-ctrl" id="btn_next">Next ⏭</button>
+            <div style="color: #94a3b8; font-size:14px; margin-left: 10px;">
+                Speed: <input type="range" id="speed" class="slider" min="200" max="2500" value="1000" dir="rtl">
+            </div>
+        </div>
+    </div>
+
+    <div class="status-panel" id="status_text">
+        Ready to visualize. Press Play to start!
+    </div>
+
+    <div class="section-title">Priority Queue</div>
+    <div class="queue-area" id="queue_area"></div>
+
+    <div class="section-title">Merge Actions</div>
+    <div class="tree-area" id="tree_area">
+        <div style="color:#64748b;">Merges will happen here</div>
+    </div>
+</div>
+
+<script>
+    const stepsData = JSON.parse(localStorage.getItem('huffman_steps') || '[]');
+    let currentStep = -1;
+    let playing = false;
+    let timer = null;
+
+    const uiQueue = document.getElementById('queue_area');
+    const uiTree = document.getElementById('tree_area');
+    const uiStatus = document.getElementById('status_text');
+
+    function createNodeNode(n, isSelected = false, isMerged = false) {
+        const div = document.createElement('div');
+        div.className = 'h-node';
+        if(isSelected) div.classList.add('selected');
+        if(isMerged) div.classList.add('merged');
+        
+        const displayChar = n.char === null || n.char === undefined ? '*' : (n.char === ' ' ? 'Spc' : n.char);
+        div.innerHTML = `<div class="n-char">${displayChar}</div><div class="n-freq">${n.freq}</div>`;
+        return div;
+    }
+
+    function renderStep(index) {
+        if (index < 0) {
+            uiStatus.textContent = "Beginning state...";
+            renderInitialElements();
+            uiTree.innerHTML = '<div style="color:#64748b;">Merges will happen here</div>';
+            return;
+        }
+
+        const step = stepsData[index];
+        const actionLabel = step.action.toUpperCase();
+        uiStatus.textContent = `Step ${index + 1}/${stepsData.length} — Action: ${actionLabel}`;
+
+        // Render remaining queue array
+        uiQueue.innerHTML = '';
+        step.queue.forEach(n => {
+            // Checks if this node exists in 'selected' context 
+            const selected = step.action !== 'insert' && step.selected.some(sn => sn.id === n.id);
+            const merged = step.action === 'insert' && step.result && step.result.id === n.id;
+            uiQueue.appendChild(createNodeNode(n, selected, merged));
+        });
+
+        // Display current tree/merge area
+        uiTree.innerHTML = '';
+        
+        if (step.action === 'select') {
+            uiStatus.textContent += ' (Selecting lowest frequencies)';
+            const wrap = document.createElement('div');
+            wrap.style.display = 'flex';
+            wrap.style.gap = '40px';
+            step.selected.forEach(sn => wrap.appendChild(createNodeNode(sn, true)));
+            uiTree.appendChild(wrap);
+        }  else if (step.action === 'merge' || step.action === 'insert') {
+            if(step.action === 'merge') uiStatus.textContent += ' (Merging nodes into sub-tree)';
+            else uiStatus.textContent += ' (Inserting merged sub-tree back to queue)';
+
+            const visual = document.createElement('div');
+            visual.className = 'merge-visual';
+            
+            const parent = createNodeNode(step.result, false, true);
+            visual.appendChild(parent);
+
+            const childrenGrp = document.createElement('div');
+            childrenGrp.className = 'merge-children';
+            step.selected.forEach(sn => childrenGrp.appendChild(createNodeNode(sn)));
+            
+            visual.appendChild(childrenGrp);
+            uiTree.appendChild(visual);
+        }
+    }
+
+    function renderInitialElements() {
+        uiQueue.innerHTML = '';
+        if(stepsData.length > 0) {
+            // Compute the real starting queue before select removes the first 2
+            const step0 = stepsData[0];
+            const allNodes = [...step0.queue, ...step0.selected].sort((a,b) => a.freq - b.freq);
+            allNodes.forEach(n => uiQueue.appendChild(createNodeNode(n)));
+        } else {
+            uiQueue.innerHTML = '<div style="color:#64748b;">No data encoded.</div>';
+        }
+    }
+
+    function init() {
+        if(stepsData.length === 0) {
+            uiStatus.textContent = "Error: No step data found. Please encode text via Animator first.";
+            uiQueue.innerHTML = '';
+            uiTree.innerHTML = '';
+            return;
+        }
+        renderStep(-1);
+    }
+
+    function doNext() {
+        if(currentStep < stepsData.length - 1) {
+            currentStep++;
+            renderStep(currentStep);
+        } else {
+            stopAnim();
+            uiStatus.textContent = "Visualization Complete!";
+        }
+    }
+
+    function doPrev() {
+        if(currentStep > -1) {
+            currentStep--;
+            renderStep(currentStep);
+        }
+    }
+
+    function playAnim() {
+        if(stepsData.length === 0) return;
+        if(currentStep >= stepsData.length - 1) {
+            currentStep = -1; // Reset to loop around
+        }
+        
+        playing = true;
+        document.getElementById('btn_play').style.display = 'none';
+        document.getElementById('btn_pause').style.display = 'inline-block';
+        
+        const speed = parseInt(document.getElementById('speed').value);
+        timer = setInterval(doNext, speed);
+    }
+
+    function stopAnim() {
+        playing = false;
+        document.getElementById('btn_play').style.display = 'inline-block';
+        document.getElementById('btn_pause').style.display = 'none';
+        clearInterval(timer);
+    }
+
+    document.getElementById('btn_next').addEventListener('click', () => { stopAnim(); doNext(); });
+    document.getElementById('btn_prev').addEventListener('click', () => { stopAnim(); doPrev(); });
+    document.getElementById('btn_play').addEventListener('click', playAnim);
+    document.getElementById('btn_pause').addEventListener('click', stopAnim);
+
+    document.getElementById('speed').addEventListener('input', () => {
+        if(playing) {
+            stopAnim();
+            playAnim();
+        }
+    });
+
+    init();
+</script>
+{% endblock %}
